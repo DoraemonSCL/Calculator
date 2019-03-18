@@ -2,14 +2,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Parameter;
 import java.util.Stack;
 
 public class Main
 {
 
     private static String[] op = { "+", "-", "*", "/" };// Operation set
-    public static void main(String[] args) {
-        int foumula = Integer.parseInt(args[0]) ;
+    public static void main(String[] args)
+    {
+       int foumula = Integer.parseInt(args[0]) ; // get order para
+       // int foumula = 3 ;
         if (foumula > 100  && foumula < 0 )
         {
             System.out.println("INPUT ERROR!!!");
@@ -27,17 +30,47 @@ public class Main
 
     }
 
-    public static String MakeFormula()
+    public static String MakeFormula() // create formula
     {
         StringBuilder build = new StringBuilder();
-        int count = (int) (Math.random() * 2) + 1; //
+        int count = (int) (Math.random() * 2) + 1; // the operation is range(1 , 3)
         int start = 0;
-        int number1 = (int) (Math.random() * 99) + 1; //
+        int number1 = (int) (Math.random() * 100);
         build.append(number1);
         while (start <= count)
         {
-            int operation = (int) (Math.random() * 3); //
-            int number2 = (int) (Math.random() * 99) + 1;//
+            int operation = (int) (Math.random() * 4); //select operation
+            int number2 = (int) (Math.random() * 100) ;// this number is range(0 , 100)
+            if (operation == 3)
+            {
+                if (build.charAt(build.length() -2 ) >='0' && build.charAt(build.length() -2 ) <= '9')
+                {
+                 int   tempNumber = (build.charAt(build.length() -2 ) - '0')* 10 + (build.charAt(build.length() -1) -'0');
+
+                    while ( tempNumber != number2)
+                    {
+                        if (tempNumber > number2)
+                            tempNumber = tempNumber - number2 ;
+                        else
+                            number2 = number2 - tempNumber ;
+                    }
+
+                }else
+                {
+                    int  tempNumber = build.charAt(build.length() - 1) - '0' ;
+
+                    while ( tempNumber != number2)
+                    {
+                        if (tempNumber > number2)
+                            tempNumber = tempNumber - number2 ;
+                        else
+                            number2 = number2 - tempNumber ;
+                    }
+
+                }
+
+
+            }
             build.append(op[operation]).append(number2);
             start ++;
         }
@@ -45,10 +78,10 @@ public class Main
     }
 
     public static String Solve(String formula)
-    {  //
-        Stack<String> tempStack = new Stack<>();//
-        Stack<Character> operatorStack = new Stack<>();//
-        int len = formula.length(); //
+    {
+        Stack<String> tempStack = new Stack<>();// number stack
+        Stack<Character> operatorStack = new Stack<>();// operation stack
+        int len = formula.length(); // get formula length
         int k = 0;
         for(int j = -1; j < len - 1; j++)
         {
@@ -67,7 +100,8 @@ public class Main
                     if(operatorStack.empty())
                     {
                         operatorStack.push(formulaChar); //if operatorStack is empty, store it
-                    }else
+                    }
+                    else
                         {
                         char stackChar = operatorStack.peek();
                         if ((stackChar == '+' || stackChar == '-')
@@ -75,18 +109,21 @@ public class Main
                             operatorStack.push(formulaChar);
                         }else
                             {
-                            tempStack.push(operatorStack.pop().toString());
-                            operatorStack.push(formulaChar);
+                            tempStack.push(operatorStack.pop().toString());//如果出现优先级更高的字符，将加减转为字符存储在暂存栈
+                            operatorStack.push(formulaChar);//
                             }
                     }
                 }
                 k = j + 2;
             }
         }
+
         while (!operatorStack.empty())
         { // Append remaining operators
             tempStack.push(operatorStack.pop().toString());
         }
+
+
         Stack<String> calcStack = new Stack<>();
         for(String peekChar : tempStack)
         { // Reverse traversing of stack
